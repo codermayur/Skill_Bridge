@@ -1,0 +1,366 @@
+/* ── Page ──────────────────────────────────────────────────── */
+.cr-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--sp-10) var(--sp-4);
+}
+
+/* ── Card shell ────────────────────────────────────────────── */
+.cr-card {
+  width: 100%;
+  max-width: 640px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+}
+
+/* ── Header ────────────────────────────────────────────────── */
+.cr-header {
+  padding: var(--sp-8) var(--sp-8) 0;
+}
+
+.cr-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--fw-bold);
+  letter-spacing: -0.02em;
+}
+
+.cr-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin-top: var(--sp-1);
+}
+
+/* ── Progress bar ──────────────────────────────────────────── */
+.cr-progress-bar {
+  height: 3px;
+  background: var(--border);
+  margin: var(--sp-6) var(--sp-8) 0;
+}
+.cr-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 2px;
+  transition: width 0.5s var(--ease-out);
+}
+
+/* ── Step indicator ────────────────────────────────────────── */
+.cr-steps {
+  display: flex;
+  align-items: center;
+  padding: var(--sp-6) var(--sp-8);
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.cr-steps::-webkit-scrollbar { display: none; }
+
+.cr-step-item {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+.cr-step-circle {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs);
+  font-weight: var(--fw-bold);
+  flex-shrink: 0;
+  transition: all var(--duration-normal) var(--ease-out);
+  z-index: 1;
+}
+.cr-step-done    { background: var(--success);    color: #fff; }
+.cr-step-active  { background: var(--primary);    color: #fff; box-shadow: 0 0 0 4px var(--primary-dim); }
+.cr-step-pending { background: var(--bg-elevated); color: var(--text-muted); border: 1px solid var(--border); }
+
+.cr-step-label {
+  font-size: var(--text-xs);
+  font-weight: var(--fw-medium);
+  color: var(--text-muted);
+  margin: 0 var(--sp-2);
+  white-space: nowrap;
+}
+.cr-step-label-active { color: var(--text-primary); }
+
+.cr-step-line {
+  height: 1px;
+  width: 32px;
+  background: var(--border);
+  flex-shrink: 0;
+  transition: background var(--duration-normal);
+}
+.cr-step-line-done { background: var(--success); }
+
+/* ── Step content ──────────────────────────────────────────── */
+.cr-step-content {
+  padding: var(--sp-6) var(--sp-8) var(--sp-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  min-height: 260px;
+}
+
+/* ── Labels / Inputs ───────────────────────────────────────── */
+.cr-label {
+  font-size: var(--text-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--text-secondary);
+}
+
+.cr-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cr-input, .cr-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  font-family: var(--font-sans);
+  outline: none;
+  transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+}
+.cr-input:focus, .cr-textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-dim);
+}
+.cr-input-error {
+  border-color: var(--error) !important;
+  box-shadow: 0 0 0 3px var(--error-dim) !important;
+}
+.cr-textarea { resize: vertical; line-height: var(--leading-relaxed); }
+
+.cr-error {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  font-size: var(--text-xs);
+  color: var(--error);
+}
+
+.cr-hint {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-top: calc(-1 * var(--sp-2));
+}
+
+/* ── AI tip ────────────────────────────────────────────────── */
+.cr-ai-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 4px 10px;
+  background: rgba(168,85,247,.12);
+  border: 1px solid rgba(168,85,247,.25);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-semibold);
+  color: #c084fc;
+  cursor: pointer;
+  transition: background var(--duration-fast);
+}
+.cr-ai-btn:hover { background: rgba(168,85,247,.2); }
+
+.cr-ai-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  background: rgba(168,85,247,.1);
+  border: 1px solid rgba(168,85,247,.2);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: #d8b4fe;
+  line-height: var(--leading-relaxed);
+}
+.cr-ai-tip > svg { flex-shrink: 0; margin-top: 2px; }
+.cr-ai-tip > span { flex: 1; }
+.cr-ai-tip > button { background: none; border: none; color: #d8b4fe; cursor: pointer; flex-shrink: 0; }
+
+/* ── Category grid ─────────────────────────────────────────── */
+.cr-category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--sp-3);
+}
+
+.cr-category-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+}
+.cr-category-btn:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+.cr-category-active {
+  background: var(--primary-dim);
+  border-color: rgba(99,102,241,.4);
+  color: #a5b4fc;
+}
+
+/* ── Skills ────────────────────────────────────────────────── */
+.cr-skill-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.cr-skill-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.cr-skill-input {
+  width: 100%;
+  padding: 10px 14px 10px 36px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  outline: none;
+  transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+}
+.cr-skill-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-dim);
+}
+
+.cr-skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.cr-skill-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 4px 10px;
+  background: var(--primary-dim);
+  border: 1px solid rgba(99,102,241,.3);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-medium);
+  color: #a5b4fc;
+}
+.cr-skill-tag button {
+  display: flex; align-items: center;
+  background: none; border: none;
+  color: rgba(165,180,252,.6);
+  cursor: pointer; padding: 0;
+  transition: color var(--duration-fast);
+}
+.cr-skill-tag button:hover { color: var(--error); }
+
+.cr-skill-suggestions { }
+
+.cr-suggestion-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.cr-suggestion-chip {
+  padding: 4px 10px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--duration-fast), border-color var(--duration-fast);
+}
+.cr-suggestion-chip:hover {
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+}
+
+/* ── Review ────────────────────────────────────────────────── */
+.cr-review-title {
+  font-size: var(--text-lg);
+  font-weight: var(--fw-semibold);
+  margin-bottom: var(--sp-2);
+}
+
+.cr-review-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: var(--sp-4);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.cr-review-label {
+  font-size: var(--text-xs);
+  font-weight: var(--fw-semibold);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.cr-review-value {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  line-height: var(--leading-relaxed);
+}
+
+.cr-review-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+}
+
+.cr-review-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+  margin-top: var(--sp-1);
+}
+
+/* ── Nav ───────────────────────────────────────────────────── */
+.cr-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-6) var(--sp-8) var(--sp-8);
+  border-top: 1px solid var(--border);
+  margin-top: var(--sp-6);
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .cr-card { border-radius: var(--radius-xl); }
+  .cr-header, .cr-step-content, .cr-nav { padding-left: var(--sp-5); padding-right: var(--sp-5); }
+  .cr-progress-bar { margin-left: var(--sp-5); margin-right: var(--sp-5); }
+  .cr-steps { padding-left: var(--sp-5); }
+  .cr-review-row { grid-template-columns: 1fr; }
+  .cr-category-grid { grid-template-columns: 1fr 1fr; }
+}

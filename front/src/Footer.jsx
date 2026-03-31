@@ -1,4 +1,5 @@
-import { Link, useEffect, useState } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import "./Footer.css";
 
 function Footer() {

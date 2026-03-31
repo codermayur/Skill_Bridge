@@ -39,6 +39,32 @@ const userSchema = new mongoose.Schema({
       default: Date.now,
     },
   }],
+
+  // SaaS platform fields
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user',
+  },
+  skills: {
+    type: [String],
+    default: [],
+  },
+  bio: {
+    type: String,
+    trim: true,
+    maxlength: 500,
+    default: '',
+  },
+  reputation: {
+    score: { type: Number, default: 0 },
+    totalReviews: { type: Number, default: 0 },
+    totalRating: { type: Number, default: 0 },
+  },
+  isBanned: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // Hash password before saving

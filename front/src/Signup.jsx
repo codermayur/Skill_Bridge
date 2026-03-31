@@ -1,377 +1,155 @@
-import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { authAPI } from "./services/api";
-import "./auth/Auth.css";
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Mail, Lock, Eye, EyeOff, User, AlertCircle, Loader2, Zap, Check } from 'lucide-react';
+import { authAPI } from './services/api';
+import { useAuth } from './context/AuthContext';
+import './auth/Auth.css';
 
-function SignUp() {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    agreeToTerms: false,
-  });
-  const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState(0);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  // Calculate password strength
-  useEffect(() => {
-    const password = formData.password;
-    let strength = 0;
-
-    if (password.length >= 6) strength++;
-    if (password.length >= 10) strength++;
-    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-    if (/[0-9]/.test(password)) strength++;
-    if (/[^a-zA-Z0-9]/.test(password)) strength++;
-
-    setPasswordStrength(strength);
-  }, [formData.password]);
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = "Full name is required";
-    } else if (formData.fullName.trim().length < 3) {
-      newErrors.fullName = "Name must be at least 3 characters";
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Enter a valid email";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-
-    if (!formData.agreeToTerms) {
-      newErrors.agreeToTerms = "You must agree to the terms";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleChange = (e) => {
-    const { name, value, checked, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }));
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const response = await authAPI.signup(
-        formData.fullName,
-        formData.email,
-        formData.password
-      );
-
-      // Store token and user data
-      localStorage.setItem("userToken", response.token);
-      localStorage.setItem("userData", JSON.stringify(response.user));
-
-      alert("✓ Account created successfully! Welcome to Skill Bridge!");
-      navigate("/profile");
-    } catch (error) {
-      setErrors({ submit: error.message || "Sign up failed. Please try again." });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const getPasswordStrengthLabel = () => {
-    const labels = ["Very Weak", "Weak", "Fair", "Good", "Strong"];
-    return labels[passwordStrength - 1] || "Enter password";
-  };
-
-  const getPasswordStrengthColor = () => {
-    const colors = ["#f5576c", "#f5576c", "#ffa502", "#00d4ff", "#00ff00"];
-    return colors[passwordStrength - 1] || "#ccc";
-  };
-
+function PasswordStrength({ password }) {
+  const checks = [
+    { label: '8+ characters', ok: password.length >= 8 },
+    { label: 'Uppercase',     ok: /[A-Z]/.test(password) },
+    { label: 'Number',        ok: /\d/.test(password) },
+  ];
+  const score = checks.filter((c) => c.ok).length;
+  const colors = ['var(--error)', 'var(--warning)', 'var(--success)'];
+  const labels = ['Weak', 'Fair', 'Strong'];
   return (
-    <div className="auth-container">
-      {/* Animated Background */}
-      <div className="auth-bg-animation">
-        <div className="blob blob-1"></div>
-        <div className="blob blob-2"></div>
-        <div className="blob blob-3"></div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+      <div style={{ display: 'flex', gap: '4px' }}>
+        {[0,1,2].map((i) => (
+          <div key={i} style={{ flex: 1, height: '4px', borderRadius: '2px', background: i < score ? colors[score - 1] : 'var(--border)', transition: 'background 0.3s' }} />
+        ))}
       </div>
-
-      <div className="auth-content">
-        {/* Left Side - Illustration */}
-        <div className="auth-left">
-          <div className="auth-illustration">
-            <div className="illustration-content">
-              <div className="illustration-circle large"></div>
-              <div className="illustration-circle medium"></div>
-              <div className="illustration-circle small"></div>
-              <div className="illustration-icon">🎓</div>
-            </div>
-          </div>
-          <div className="auth-left-text">
-            <h2>Start Your Journey!</h2>
-            <p>Join thousands of developers mastering programming and landing their dream jobs</p>
-            <div className="stats-grid">
-              <div className="stat">
-                <div className="stat-number">10K+</div>
-                <div className="stat-label">Active Learners</div>
-              </div>
-              <div className="stat">
-                <div className="stat-number">500+</div>
-                <div className="stat-label">Problems</div>
-              </div>
-              <div className="stat">
-                <div className="stat-number">12+</div>
-                <div className="stat-label">Languages</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Side - Form */}
-        <div className="auth-right">
-          <div className="form-container">
-            {/* Header */}
-            <div className="auth-header">
-              <div className="header-icon">
-                <span>⭐</span>
-              </div>
-              <h1>Create Account</h1>
-              <p>Start learning and grow with us</p>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="auth-form">
-              {/* Full Name */}
-              <div className="form-group">
-                <label htmlFor="fullName">Full Name</label>
-                <div className="input-wrapper">
-                  <input
-                    id="fullName"
-                    type="text"
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    placeholder="John Doe"
-                    className={errors.fullName ? "input-error" : ""}
-                    autoComplete="name"
-                  />
-                  <span className="input-icon">👤</span>
-                </div>
-                {errors.fullName && (
-                  <span className="error-message">{errors.fullName}</span>
-                )}
-              </div>
-
-              {/* Email */}
-              <div className="form-group">
-                <label htmlFor="email">Email Address</label>
-                <div className="input-wrapper">
-                  <input
-                    id="email"
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="you@example.com"
-                    className={errors.email ? "input-error" : ""}
-                    autoComplete="email"
-                  />
-                  <span className="input-icon">📧</span>
-                </div>
-                {errors.email && (
-                  <span className="error-message">{errors.email}</span>
-                )}
-              </div>
-
-              {/* Password */}
-              <div className="form-group">
-                <label htmlFor="password">Password</label>
-                <div className="input-wrapper">
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="••••••••"
-                    className={errors.password ? "input-error" : ""}
-                    autoComplete="new-password"
-                  />
-                  <button
-                    type="button"
-                    className="input-icon-btn"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? "👁️" : "👁️‍🗨️"}
-                  </button>
-                </div>
-
-                {/* Password Strength Indicator */}
-                {formData.password && (
-                  <div className="password-strength">
-                    <div className="strength-bar-container">
-                      <div
-                        className="strength-bar"
-                        style={{
-                          width: `${(passwordStrength / 5) * 100}%`,
-                          backgroundColor: getPasswordStrengthColor(),
-                        }}
-                      ></div>
-                    </div>
-                    <span
-                      className="strength-label"
-                      style={{ color: getPasswordStrengthColor() }}
-                    >
-                      {getPasswordStrengthLabel()}
-                    </span>
-                  </div>
-                )}
-
-                {errors.password && (
-                  <span className="error-message">{errors.password}</span>
-                )}
-              </div>
-
-              {/* Confirm Password */}
-              <div className="form-group">
-                <label htmlFor="confirmPassword">Confirm Password</label>
-                <div className="input-wrapper">
-                  <input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    placeholder="••••••••"
-                    className={errors.confirmPassword ? "input-error" : ""}
-                    autoComplete="new-password"
-                  />
-                  <button
-                    type="button"
-                    className="input-icon-btn"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
-                  </button>
-                </div>
-                {errors.confirmPassword && (
-                  <span className="error-message">{errors.confirmPassword}</span>
-                )}
-              </div>
-
-              {/* Terms Agreement */}
-              <div className="checkbox-group">
-                <input
-                  id="agreeToTerms"
-                  type="checkbox"
-                  name="agreeToTerms"
-                  checked={formData.agreeToTerms}
-                  onChange={handleChange}
-                />
-                <label htmlFor="agreeToTerms">
-                  I agree to the{" "}
-                  <a href="#terms" className="link">
-                    Terms of Service
-                  </a>{" "}
-                  and{" "}
-                  <a href="#privacy" className="link">
-                    Privacy Policy
-                  </a>
-                </label>
-              </div>
-              {errors.agreeToTerms && (
-                <span className="error-message">{errors.agreeToTerms}</span>
-              )}
-
-              {/* Error Alert */}
-              {errors.submit && (
-                <div className="error-alert">
-                  <span className="alert-icon">⚠️</span>
-                  {errors.submit}
-                </div>
-              )}
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                className="submit-btn"
-                disabled={isLoading}
-              >
-                <span className="btn-text">
-                  {isLoading ? "Creating Account..." : "Create Account"}
-                </span>
-                {isLoading && <span className="loader"></span>}
-              </button>
-            </form>
-
-            {/* Divider */}
-            <div className="form-divider">
-              <span>Or sign up with</span>
-            </div>
-
-            {/* Social Signup */}
-            <div className="social-login">
-              <button className="social-btn google" title="Sign up with Google">
-                <span>🔍</span>
-              </button>
-              <button className="social-btn github" title="Sign up with GitHub">
-                <span>🐙</span>
-              </button>
-              <button className="social-btn linkedin" title="Sign up with LinkedIn">
-                <span>💼</span>
-              </button>
-            </div>
-
-            {/* Footer */}
-            <div className="auth-footer">
-              <p>
-                Already have an account?{" "}
-                <Link to="/login" className="link">
-                  Sign in here
-                </Link>
-              </p>
-            </div>
-          </div>
-        </div>
+      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+        {checks.map(({ label, ok }) => (
+          <span key={label} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.7rem', color: ok ? 'var(--success)' : 'var(--text-muted)' }}>
+            <Check size={11} /> {label}
+          </span>
+        ))}
       </div>
     </div>
   );
 }
 
-export default SignUp;
+export default function Signup() {
+  const [form, setForm]         = useState({ fullName: '', email: '', password: '' });
+  const [errors, setErrors]     = useState({});
+  const [loading, setLoading]   = useState(false);
+  const [showPass, setShowPass] = useState(false);
+  const navigate = useNavigate();
+  const { login, isLoggedIn } = useAuth();
+
+  useEffect(() => { if (isLoggedIn) navigate('/profile', { replace: true }); }, [isLoggedIn, navigate]);
+
+  const validate = () => {
+    const e = {};
+    if (!form.fullName.trim() || form.fullName.trim().length < 2) e.fullName = 'Enter your full name';
+    if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Enter a valid email';
+    if (!form.password || form.password.length < 6) e.password = 'At least 6 characters';
+    setErrors(e);
+    return !Object.keys(e).length;
+  };
+
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+    if (errors[name]) setErrors((er) => ({ ...er, [name]: '' }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+    setLoading(true);
+    try {
+      const res = await authAPI.signup(form.fullName, form.email, form.password);
+      login(res.token, res.user);
+      navigate('/profile');
+    } catch (err) {
+      setErrors({ submit: err.message || 'Sign up failed. Please try again.' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="auth-page">
+      <div className="auth-card">
+        <Link to="/" className="auth-logo">
+          <div className="auth-logo-icon"><Zap size={20} strokeWidth={2.5} /></div>
+          <span className="auth-logo-text">Skill<span>Bridge</span></span>
+        </Link>
+
+        <div className="auth-heading">
+          <h1>Create your account</h1>
+          <p>Join thousands of developers learning together</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="auth-form" noValidate>
+          {/* Name */}
+          <div className="auth-field">
+            <label htmlFor="fullName" className="auth-label">Full name</label>
+            <div className="auth-input-wrap">
+              <input
+                id="fullName" type="text" name="fullName"
+                value={form.fullName} onChange={onChange}
+                placeholder="Jane Doe"
+                className={`auth-input ${errors.fullName ? 'error' : ''}`}
+                autoComplete="name" autoFocus
+              />
+              <span className="auth-input-icon"><User size={16} /></span>
+            </div>
+            {errors.fullName && <span className="auth-error"><AlertCircle size={12} />{errors.fullName}</span>}
+          </div>
+
+          {/* Email */}
+          <div className="auth-field">
+            <label htmlFor="email" className="auth-label">Email address</label>
+            <div className="auth-input-wrap">
+              <input
+                id="email" type="email" name="email"
+                value={form.email} onChange={onChange}
+                placeholder="you@example.com"
+                className={`auth-input ${errors.email ? 'error' : ''}`}
+                autoComplete="email"
+              />
+              <span className="auth-input-icon"><Mail size={16} /></span>
+            </div>
+            {errors.email && <span className="auth-error"><AlertCircle size={12} />{errors.email}</span>}
+          </div>
+
+          {/* Password */}
+          <div className="auth-field">
+            <label htmlFor="password" className="auth-label">Password</label>
+            <div className="auth-input-wrap">
+              <input
+                id="password" type={showPass ? 'text' : 'password'} name="password"
+                value={form.password} onChange={onChange}
+                placeholder="Create a strong password"
+                className={`auth-input ${errors.password ? 'error' : ''}`}
+                autoComplete="new-password"
+              />
+              <button type="button" className="auth-input-icon" onClick={() => setShowPass((v) => !v)}>
+                {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+            {form.password && <PasswordStrength password={form.password} />}
+            {errors.password && <span className="auth-error"><AlertCircle size={12} />{errors.password}</span>}
+          </div>
+
+          {errors.submit && (
+            <div className="auth-alert"><AlertCircle size={16} />{errors.submit}</div>
+          )}
+
+          <button type="submit" className="auth-submit" disabled={loading}>
+            {loading ? <><Loader2 size={16} className="animate-spin" /> Creating account…</> : 'Create Account'}
+          </button>
+        </form>
+
+        <p className="auth-footer-link">
+          Already have an account? <Link to="/login">Sign in</Link>
+        </p>
+      </div>
+    </div>
+  );
+}

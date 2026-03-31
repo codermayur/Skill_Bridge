@@ -1,42 +1,72 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+/* ── Page loader ───────────────────────────────────────────── */
+.page-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  min-height: 50vh;
+}
+
+.page-loader-icon {
+  width: 56px; height: 56px;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 8px 24px var(--primary-glow);
+}
+
+.page-loader-spinner { color: var(--text-muted); }
+
+/* ── 404 ───────────────────────────────────────────────────── */
+.not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
+  min-height: 60vh;
+  padding: var(--sp-8);
+  gap: var(--sp-4);
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.not-found-code {
+  font-size: 7rem;
+  font-weight: var(--fw-black);
+  line-height: 1;
+  letter-spacing: -0.04em;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.not-found-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--fw-bold);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.not-found-desc {
+  color: var(--text-secondary);
+  max-width: 360px;
+  font-size: var(--text-base);
 }
 
-.card {
-  padding: 2em;
+.not-found-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 10px 24px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: var(--radius-md);
+  font-weight: var(--fw-semibold);
+  font-size: var(--text-sm);
+  text-decoration: none;
+  transition: background var(--duration-fast), box-shadow var(--duration-fast);
+  margin-top: var(--sp-2);
 }
-
-.read-the-docs {
-  color: #888;
+.not-found-btn:hover {
+  background: var(--primary-hover);
+  color: #fff;
+  box-shadow: 0 4px 14px var(--primary-glow);
 }

@@ -1,0 +1,4 @@
+#!/bin/sh
+# Run lint-staged before every commit
+# Formats staged JS/JSX/CSS/JSON/MD files with Prettier
+npx lint-staged

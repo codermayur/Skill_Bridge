@@ -9,18 +9,23 @@ const testScoreSchema = new mongoose.Schema({
   language: {
     type: String,
     required: true,
+    trim: true,
   },
   score: {
     type: Number,
     required: true,
+    min: 0,
   },
   totalQuestions: {
     type: Number,
     required: true,
+    min: 1,
   },
   percentage: {
     type: Number,
     required: true,
+    min: 0,
+    max: 100,
   },
   answers: [{
     questionId: Number,
@@ -33,6 +38,10 @@ const testScoreSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
+// Indexes for frequent query patterns
+testScoreSchema.index({ user: 1, date: -1 });
+testScoreSchema.index({ user: 1, language: 1, date: -1 });
 
 const TestScore = mongoose.model('TestScore', testScoreSchema);
 

@@ -1,275 +1,118 @@
-import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { authAPI } from "./services/api";
-import "./auth/Auth.css";
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Mail, Lock, Eye, EyeOff, AlertCircle, Loader2, Zap } from 'lucide-react';
+import { authAPI } from './services/api';
+import { useAuth } from './context/AuthContext';
+import './auth/Auth.css';
 
-function Login() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    rememberMe: false,
-  });
-  const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [activeTab, setActiveTab] = useState("email");
+export default function Login() {
+  const [form, setForm]             = useState({ email: '', password: '' });
+  const [errors, setErrors]         = useState({});
+  const [loading, setLoading]       = useState(false);
+  const [showPass, setShowPass]     = useState(false);
   const navigate = useNavigate();
+  const { login, isLoggedIn } = useAuth();
 
-  useEffect(() => {
-    // Scroll to top on mount
-    window.scrollTo(0, 0);
-  }, []);
+  useEffect(() => { if (isLoggedIn) navigate('/profile', { replace: true }); }, [isLoggedIn, navigate]);
 
-  const validateForm = () => {
-    const newErrors = {};
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Enter a valid email";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const validate = () => {
+    const e = {};
+    if (!form.email.trim())                     e.email = 'Email is required';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Enter a valid email';
+    if (!form.password)                          e.password = 'Password is required';
+    else if (form.password.length < 6)           e.password = 'At least 6 characters';
+    setErrors(e);
+    return !Object.keys(e).length;
   };
 
-  const handleChange = (e) => {
-    const { name, value, checked, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }));
-    }
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+    if (errors[name]) setErrors((er) => ({ ...er, [name]: '' }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    setIsLoading(true);
-
+    if (!validate()) return;
+    setLoading(true);
     try {
-      const response = await authAPI.login(formData.email, formData.password);
-
-      // Store token and user data
-      localStorage.setItem("userToken", response.token);
-      localStorage.setItem("userData", JSON.stringify(response.user));
-
-      // Show success message
-      alert("✓ Login successful! Welcome back!");
-      navigate("/profile");
-    } catch (error) {
-      setErrors({ submit: error.message || "Login failed. Please try again." });
+      const res = await authAPI.login(form.email, form.password);
+      login(res.token, res.user);
+      navigate('/profile');
+    } catch (err) {
+      setErrors({ submit: err.message || 'Login failed. Please try again.' });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="auth-container">
-      {/* Animated Background */}
-      <div className="auth-bg-animation">
-        <div className="blob blob-1"></div>
-        <div className="blob blob-2"></div>
-        <div className="blob blob-3"></div>
-      </div>
+    <div className="auth-page">
+      <div className="auth-card">
+        {/* Logo */}
+        <Link to="/" className="auth-logo">
+          <div className="auth-logo-icon"><Zap size={20} strokeWidth={2.5} /></div>
+          <span className="auth-logo-text">Skill<span>Bridge</span></span>
+        </Link>
 
-      <div className="auth-content">
-        {/* Left Side - Illustration */}
-        <div className="auth-left">
-          <div className="auth-illustration">
-            <div className="illustration-content">
-              <div className="illustration-circle large"></div>
-              <div className="illustration-circle medium"></div>
-              <div className="illustration-circle small"></div>
-              <div className="illustration-icon">🔐</div>
-            </div>
-          </div>
-          <div className="auth-left-text">
-            <h2>Welcome Back!</h2>
-            <p>Log in to continue your coding journey and compete with developers worldwide</p>
-            <div className="features-list">
-              <div className="feature">
-                <span className="feature-icon">✓</span>
-                <span>Track your progress</span>
-              </div>
-              <div className="feature">
-                <span className="feature-icon">✓</span>
-                <span>Compete on leaderboard</span>
-              </div>
-              <div className="feature">
-                <span className="feature-icon">✓</span>
-                <span>Unlock achievements</span>
-              </div>
-            </div>
-          </div>
+        {/* Heading */}
+        <div className="auth-heading">
+          <h1>Welcome back</h1>
+          <p>Sign in to continue your journey</p>
         </div>
 
-        {/* Right Side - Form */}
-        <div className="auth-right">
-          <div className="form-container">
-            {/* Header */}
-            <div className="auth-header">
-              <div className="header-icon">
-                <span>🚀</span>
-              </div>
-              <h1>Skill Bridge</h1>
-              <p>Sign in to your account</p>
+        <form onSubmit={handleSubmit} className="auth-form" noValidate>
+          {/* Email */}
+          <div className="auth-field">
+            <label htmlFor="email" className="auth-label">Email address</label>
+            <div className="auth-input-wrap">
+              <input
+                id="email" type="email" name="email"
+                value={form.email} onChange={onChange}
+                placeholder="you@example.com"
+                className={`auth-input ${errors.email ? 'error' : ''}`}
+                autoComplete="email" autoFocus
+              />
+              <span className="auth-input-icon"><Mail size={16} /></span>
             </div>
-
-            {/* Tabs */}
-            <div className="auth-tabs">
-              <button
-                className={`tab-btn ${activeTab === "email" ? "active" : ""}`}
-                onClick={() => setActiveTab("email")}
-              >
-                <span>📧</span> Email
-              </button>
-              <button
-                className={`tab-btn ${activeTab === "phone" ? "active" : ""}`}
-                onClick={() => setActiveTab("phone")}
-                disabled
-              >
-                <span>📱</span> Phone
-              </button>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="auth-form">
-              {/* Email Field */}
-              <div className="form-group">
-                <label htmlFor="email">Email Address</label>
-                <div className="input-wrapper">
-                  <input
-                    id="email"
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="you@example.com"
-                    className={errors.email ? "input-error" : ""}
-                    autoComplete="email"
-                  />
-                  <span className="input-icon">📧</span>
-                </div>
-                {errors.email && (
-                  <span className="error-message">{errors.email}</span>
-                )}
-              </div>
-
-              {/* Password Field */}
-              <div className="form-group">
-                <div className="label-row">
-                  <label htmlFor="password">Password</label>
-                  <Link to="/forgot-password" className="forgot-link">
-                    Forgot?
-                  </Link>
-                </div>
-                <div className="input-wrapper">
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="••••••••"
-                    className={errors.password ? "input-error" : ""}
-                    autoComplete="current-password"
-                  />
-                  <button
-                    type="button"
-                    className="input-icon-btn"
-                    onClick={() => setShowPassword(!showPassword)}
-                    title={showPassword ? "Hide password" : "Show password"}
-                  >
-                    {showPassword ? "👁️" : "👁️‍🗨️"}
-                  </button>
-                </div>
-                {errors.password && (
-                  <span className="error-message">{errors.password}</span>
-                )}
-              </div>
-
-              {/* Remember Me */}
-              <div className="checkbox-group">
-                <input
-                  id="rememberMe"
-                  type="checkbox"
-                  name="rememberMe"
-                  checked={formData.rememberMe}
-                  onChange={handleChange}
-                />
-                <label htmlFor="rememberMe">Remember me for 30 days</label>
-              </div>
-
-              {/* Error Alert */}
-              {errors.submit && (
-                <div className="error-alert">
-                  <span className="alert-icon">⚠️</span>
-                  {errors.submit}
-                </div>
-              )}
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                className="submit-btn"
-                disabled={isLoading}
-              >
-                <span className="btn-text">
-                  {isLoading ? "Signing in..." : "Sign In"}
-                </span>
-                {isLoading && <span className="loader"></span>}
-              </button>
-            </form>
-
-            {/* Divider */}
-            <div className="form-divider">
-              <span>Or continue with</span>
-            </div>
-
-            {/* Social Login */}
-            <div className="social-login">
-              <button className="social-btn google">
-                <span>🔍</span>
-              </button>
-              <button className="social-btn github">
-                <span>🐙</span>
-              </button>
-              <button className="social-btn linkedin">
-                <span>💼</span>
-              </button>
-            </div>
-
-            {/* Footer */}
-            <div className="auth-footer">
-              <p>
-                Don't have an account?{" "}
-                <Link to="/signup" className="link">
-                  Sign up here
-                </Link>
-              </p>
-            </div>
+            {errors.email && <span className="auth-error"><AlertCircle size={12} />{errors.email}</span>}
           </div>
-        </div>
+
+          {/* Password */}
+          <div className="auth-field">
+            <label htmlFor="password" className="auth-label">
+              Password
+              <Link to="/forgot-password">Forgot password?</Link>
+            </label>
+            <div className="auth-input-wrap">
+              <input
+                id="password" type={showPass ? 'text' : 'password'} name="password"
+                value={form.password} onChange={onChange}
+                placeholder="••••••••"
+                className={`auth-input ${errors.password ? 'error' : ''}`}
+                autoComplete="current-password"
+              />
+              <button type="button" className="auth-input-icon" onClick={() => setShowPass((v) => !v)} aria-label={showPass ? 'Hide password' : 'Show password'}>
+                {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+            {errors.password && <span className="auth-error"><AlertCircle size={12} />{errors.password}</span>}
+          </div>
+
+          {/* Submit error */}
+          {errors.submit && (
+            <div className="auth-alert"><AlertCircle size={16} />{errors.submit}</div>
+          )}
+
+          <button type="submit" className="auth-submit" disabled={loading}>
+            {loading ? <><Loader2 size={16} className="animate-spin" /> Signing in…</> : 'Sign In'}
+          </button>
+        </form>
+
+        <p className="auth-footer-link">
+          Don't have an account? <Link to="/signup">Create one free</Link>
+        </p>
       </div>
     </div>
   );
 }
-
-export default Login;
